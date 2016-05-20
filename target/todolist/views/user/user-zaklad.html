@@ -1,0 +1,74 @@
+<div class="table-responsive" ng-init="getItems(true);">
+	<img ng-if="dataLoading || itemsDataLoading"
+		src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
+
+	<table ng-if="!dataLoading && !itemsDataLoading" class="table">
+		<thead>
+			<tr>
+				<th><a href="javascript:void(0)" ng-click="sort('number')">{{prehlad.column1}}</a></th>
+				<th><a href="javascript:void(0)" ng-click="sort('content')">{{prehlad.column2}}</a></th>
+				<th><a href="javascript:void(0)" ng-click="sort('createdOn')">{{prehlad.column3}}</a></th>
+				<th><a href="javascript:void(0)" ng-click="sort('completed')">{{prehlad.column4}}</a></th>
+				<th></th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr ng-repeat="item in filteredItems">
+				<td>{{item.number +1}}</td>
+				<td style="padding: 5px">
+					<input type="text" class="form-control todolist-user-table-content" id="input1" ng-model="item.content" ng-disabled="item.disabled" maxlength="100" required>
+				</td>
+				<td>{{item.createdOn | date:'dd-MM-yyyy'}}</td>
+				<td class="user-todolist-table-checkbox-td">  
+					<div class="checkbox user-todolist-table-checkbox">
+          				<input type="checkbox" id={{'completed'+$index}} ng-model="item.completed" ng-disabled="item.disabled"/><label for={{'completed'+$index}}></label>
+        			</div>
+  				</td>
+  				<td class="todolist-user-table-td-button" ng-show="item.disabled"><button type="button" class="btn btn-default todolist-user-table-button" ng-click="editing(item.id); item.disabled = false;">{{prehlad.button1}}</button></td>
+				<td class="todolist-user-table-td-button" ng-show="!item.disabled">
+					<button type="button" class="btn btn-default todolist-user-table-button" ng-click="item.disabled = true; cancel(item.id); newItemInsert = false; itemDeleteConfirm = false;">{{prehlad.button2}}</button>
+					<button type="button" class="btn btn-default todolist-user-table-button" ng-click="updateItem(item); itemDeleteConfirm = false;" ng-disabled="item.content == undefined">{{prehlad.button3}}</button>
+				</td>
+				<td class="todolist-user-table-td-button" ng-show="item.disabled && !itemDeleteConfirm">
+					<button type="button" class="btn btn-default todolist-user-table-button" ng-click="deleting(); itemDeleteConfirm = true;">{{prehlad.button4}}</button>
+				</td>
+				<td class="todolist-user-table-td-button" ng-show="item.disabled && itemDeleteConfirm">
+					<button type="button" class="btn btn-default todolist-user-table-button" ng-click="itemDeleteConfirm = false;">{{prehlad.button5}}</button>
+					<button type="button" class="btn btn-default todolist-user-table-button" ng-click="deleteItem(item); itemDeleteConfirm = false;">{{prehlad.button6}}</button>
+				</td>
+  				
+			</tr>
+		</tbody>
+	</table>
+	
+	<div style="display:inline-block">
+		<uib-pagination 
+  			ng-model="currentPage"
+  			total-items="items.length"
+  			max-size="maxSize"  
+  			boundary-links="true"
+  			class="vos-pagination"  			
+  			previous-text="&lsaquo;" 
+  			next-text="&rsaquo;" 
+  			first-text="&laquo;" 
+  			last-text="&raquo;">
+		</uib-pagination>
+	</div>
+	
+	<div style="display: inline-block; float: right">	
+		<button ng-show="!newItemInsert" type="button" class="btn btn-default" ng-style="{display: inline-block}" ng-click="newItemInsert = true; setNewItem()"><span class="glyphicon glyphicon-plus"></span>  {{prehlad.button7}}</button>  
+	</div>
+	
+</div>
+
+<form ng-submit="insertNewItem()">
+	<div class="row-space" ng-show="newItemInsert">
+		<div class="col-sm-11">
+			<input type="text" class="form-control" id="input2" ng-model="newItem.content" placeholder="obsah" maxlength="100" required>
+		</div>
+		<div class="col-sm-1">	
+			<input type="submit" class="btn btn-default vos-button-red" value={{prehlad.button8}} /> 
+		</div>	
+	</div>
+</form>
